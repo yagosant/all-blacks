@@ -11,6 +11,32 @@
 
 <?php
 require './app/db/database.php';
+
+function removeMascaras($string)
+{
+        $string = str_replace('.', '', $string);
+        $string = str_replace('/', '', $string);
+        $string = str_replace('-', '', $string);
+        $string = str_replace('(', '', $string);
+        $string = str_replace(')', '', $string);
+        $string = str_replace('R$', '', $string);
+        $string = str_replace(' ', '', $string);
+
+        return $string;
+}
+
+function mascararCpfCnpj($cpfcnpj)
+{
+        $cpfcnpj = removeMascaras($cpfcnpj);
+    switch (strlen($cpfcnpj)) {
+        case 11:
+            return substr($cpfcnpj, 0, 3) . "." . substr($cpfcnpj, 3, 3) . "." . substr($cpfcnpj, 6, 3) . "-" . substr($cpfcnpj, 9);
+        case 14:
+            return substr($cpfcnpj, 0, 2) . "." . substr($cpfcnpj, 2, 3) . "." . substr($cpfcnpj, 5, 3) . "/" . substr($cpfcnpj, 8, 4) . "-" . substr($cpfcnpj, 12);
+    }
+        return $cpfcnpj;
+}
+
 if (isset($_POST['buttonImport'])) {
          copy($_FILES['xmlFile']['tmp_name'], 'data/' . $_FILES['xmlFile']['name']);
         $torcedores = simplexml_load_file('data/' . $_FILES['xmlFile']['name']);
@@ -20,7 +46,7 @@ if (isset($_POST['buttonImport'])) {
     foreach ($torcedores as $torcedor) {
         //print_r($torcedor['nome']);
             $query = $conn->prepare('INSERT INTO torcedores (DOCUMENTO, NOME, TELEFONE, EMAIL, CEP, ENDERECO, BAIRRO, CIDADE, UF, ATIVO) VALUES(:DOCUMENTO, :NOME, :TELEFONE, :EMAIL, :CEP, :ENDERECO, :BAIRRO, :CIDADE, :UF, :ATIVO)');
-            $query->bindValue(':DOCUMENTO', $torcedor['documento']);
+            $query->bindValue(':DOCUMENTO', removeMascaras($torcedor['documento']));
             $query->bindValue(':NOME', $torcedor['nome']);
             $query->bindValue(':TELEFONE', $torcedor['telefone']);
             $query->bindValue(':EMAIL', $torcedor['email']);
@@ -67,7 +93,7 @@ if (isset($_POST['buttonImport'])) {
         $query->execute();
         while ($torcedor = $query->fetch(PDO::FETCH_OBJ)) {?>
             <tr>
-                <td><?php echo $torcedor->DOCUMENTO?></td>
+                <td><?php echo mascararCpfCnpj($torcedor->DOCUMENTO)?></td>
                 <td><?php echo $torcedor->NOME?></td>
                 <td><?php echo $torcedor->TELEFONE?></td>
                 <td><?php echo $torcedor->EMAIL?></td>
