@@ -18,7 +18,6 @@ if (isset($_POST['buttonImport'])) {
         //print_r($torcedores->torcedor['nome']);
 
     foreach ($torcedores as $torcedor) {
-
         //print_r($torcedor['nome']);
             $query = $conn->prepare('INSERT INTO torcedores (DOCUMENTO, NOME, TELEFONE, EMAIL, CEP, ENDERECO, BAIRRO, CIDADE, UF, ATIVO) VALUES(:DOCUMENTO, :NOME, :TELEFONE, :EMAIL, :CEP, :ENDERECO, :BAIRRO, :CIDADE, :UF, :ATIVO)');
             $query->bindValue(':DOCUMENTO', $torcedor['documento']);
@@ -37,7 +36,7 @@ if (isset($_POST['buttonImport'])) {
 }
 ?>
 
-    <div class="container">
+    <div class="container mt-5">
         <h3>Insira o arquivo XML para leitura</h3>
 <form action="" method="post" enctype="multipart/form-data">
         Arquivo XML <input type="file" name="xmlFile" id="">
@@ -45,8 +44,8 @@ if (isset($_POST['buttonImport'])) {
         <input type="submit" value="Import" name="buttonImport">
     </form>
     </div>
-
-    <div class="container">
+    <hr>
+    <div class="container mt-5">
     <h3>Lista de Torcedores Cadastrados</h3>
     <table class="table">
     <thead>
